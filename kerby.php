@@ -4,10 +4,6 @@ include 'telegram.php';
 $api_key="your telegram bot api key getting from @botfather";
 $bot=new Telegram($api_key);
 
-if($bot->type=="location"){
-  $bot->sendMessage($bot->longitude." ".$bot->latitude);
-}
-
 if($bot->type=="text"){
   if($bot->text=="/start"){
     $keyboard=[["Button 1"], ["Button 2"]];
