@@ -39,6 +39,46 @@ class Telegram{
     file_get_contents($this->api.$this->api_key."/sendSticker?chat_id=".$this->chat_id."&".http_build_query($params));
   }
 
+  public function sendPhoto($params){
+    $url  = $this->api.$this->api_key."/sendPhoto?chat_id=".$this->chat_id."&".http_build_query($params);
+
+    if(!isset($params["photo"])){
+      $post_fields = array('chat_id'   => $this->chat_id,
+        'photo'     => new CURLFile(realpath($params["path"]))
+      );
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Content-Type:multipart/form-data"
+      ));
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+      $output = curl_exec($ch);}
+    else{
+      file_get_contents($url);
+    }
+  }
+
+  public function sendDocument($params){
+    $url  = $this->api.$this->api_key."/sendDocument?chat_id=".$this->chat_id."&".http_build_query($params);
+
+    if(!isset($params["document"])){
+      $post_fields = array('chat_id'   => $this->chat_id,
+        'document'     => new CURLFile(realpath($params["path"]))
+      );
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Content-Type:multipart/form-data"
+      ));
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+      $output = curl_exec($ch);}
+    else{
+      file_get_contents($url);
+    }
+  }
+
   public function answerCallbackQuery($params){
     file_get_contents($this->api.$this->api_key."/answerCallbackQuery?callback_query_id=".$this->callback_query_id."&".http_build_query($params));
   }
@@ -56,6 +96,8 @@ class Telegram{
     elseif(isset($this->all_data["message"]["location"])) $this->type="location";
     elseif(isset($this->all_data["message"]["sticker"])) $this->type="sticker";
     elseif(isset($this->all_data["callback_query"])) $this->type="callback";
+    elseif(isset($this->all_data["message"]["photo"])) $this->type="photo";
+    elseif(isset($this->all_data["message"]["document"])) $this->type="document";
     else $this->type="undefined";
   }
 
@@ -79,6 +121,12 @@ class Telegram{
         break;
       case 'sticker':
         $this->file_id=$this->all_data["message"]["sticker"]["file_id"];
+        break;
+      case 'photo':
+        $this->file_id=array_column($this->all_data["message"]["photo"], "file_id");
+        break;
+      case 'document':
+        $this->file_id=$this->all_data["message"]["document"]["file_id"];
         break;
     }
   }

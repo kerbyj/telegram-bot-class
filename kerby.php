@@ -1,21 +1,43 @@
 <?php
+
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+date_default_timezone_set('Europe/Moscow');
+
 include 'telegram.php';
+
 
 $api_key="your telegram bot api key getting from @botfather";
 $bot=new Telegram($api_key);
 
+if($bot->type=="location"){
+  $bot->sendMessage($bot->longitude." ".$bot->latitude);
+}
+
 if($bot->type=="text"){
   if($bot->text=="/start"){
-    $keyboard=[["Button 1"], ["Button 2"]];
+    $keyboard=[["Button one"], ["Button two"]];
     $reply_markup=$bot->keyboard($keyboard);
     $bot->sendMessage(['text'=>"Hello.", 'parse_mode'=>"Markdown", "reply_markup"=>$reply_markup]);
   }
   elseif($bot->text=="Inline"){
-    $reply_markup=$bot->inline_keyboard([[["text"=>"Just try", "callback_data"=>"test"]]]);
+    $reply_markup=$bot->inline_keyboard([[["text"=>"Try", "callback_data"=>"test"]]]);
     $bot->sendMessage(['text'=>"Inline", 'parse_mode'=>"Markdown", "reply_markup"=>$reply_markup]);
   }
+  elseif($bot->text=="photo"){
+    $bot->sendPhoto(["path"=>"andy.png", "caption"=>"Test"]);
+    //Also
+    //$bot->sendPhoto(["photo"=>file_id, "caption"=>"Test"]);
+  }
+  elseif($bot->text=="document"){
+    $bot->sendDocument(["path"=>"pdf.pdf"]);
+    //Also
+    //$bot->sendDocument(["document"=>file_id, "caption"=>"Test"]);
+  }
   else{
-    $bot->sendMessage(['text'=>"I know where you are", 'parse_mode'=>"Markdown"]);
+    $bot->sendMessage(['text'=>"What is it?", 'parse_mode'=>"Markdown"]);
   }
 }
 
@@ -35,6 +57,7 @@ if($bot->type=="callback") {
 if($bot->type=="sticker") {
   $bot->sendSticker(["sticker"=>$bot->file_id]);
 }
+
 
 /**
  * Some debug message
